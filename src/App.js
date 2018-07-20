@@ -4,46 +4,44 @@ import './App.css';
 
 class App extends Component {
 	state = {
-		latlng: {
+		position: {
 			lat: 44.44,
 			lng: 26.1,
 		},
+		markerPositions: [],
 		zoom: 13,
-		hasLocation: false,
 	};
 
 	mapRef = createRef();
 
-	handleClick = () => {
-		this.mapRef.current.leafletElement.locate();
-	};
-
-	handleLocationFound = (e) => {
+	handleClick = (event) => {
 		this.setState({
-			hasLocation: true,
-			latlng: e.latlng,
+			markerPositions: [...this.state.markerPositions, event.latlng],
 		});
 	};
 
 	render() {
-		const {latlng, zoom} = this.state;
-
-		const marker = this.state.hasLocation ? (
-			<Marker position={ this.state.latlng }>
-				<Popup>
-					<span>You are here</span>
-				</Popup>
-			</Marker>
-		) : null;
+		const {position, zoom, markerPositions} = this.state;
+		console.log(markerPositions);
 
 		return (
-			<Map center={ latlng } zoom={ zoom } onClick={ this.handleClick }
-			onLocationFound={ this.handleLocationFound } ref={this.mapRef}>
+			<Map center={ position } zoom={ zoom } onClick={ this.handleClick }
+			ref={this.mapRef}>
 				<TileLayer
 					attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
 					url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 				/>
-				{marker}
+				{
+					markerPositions.map((markerPosition, index) => {
+						return (
+							<Marker key={index} position={ markerPosition }>
+								<Popup>
+									<span>Popup text</span>
+								</Popup>
+							</Marker>
+						);
+					})
+				}
 			</Map>
 		);
 	}
